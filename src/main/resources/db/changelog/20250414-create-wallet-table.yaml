@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-wallet-table
+      author: denis
+      changes:
+        - createTable:
+            tableName: wallets
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                  defaultValueComputed: gen_random_uuid()
+              - column:
+                  name: balance
+                  type: DECIMAL(15,2)
+                  constraints:
+                    nullable: false
+        - addNotNullConstraint:
+            tableName: wallets
+            columnName: balance
+            columnDataType: DECIMAL(15,2)
+        - sql:
+            sql: ALTER TABLE wallets ADD CONSTRAINT check_balance_non_negative CHECK (balance >= 0)

@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/20250414-create-wallet-table.yaml
+      relativeToChangelogFile: false

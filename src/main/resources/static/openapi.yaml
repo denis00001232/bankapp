@@ -1,0 +1,174 @@
+openapi: 3.0.3
+info:
+  title: Bank Wallet API
+  description: API for managing wallet operations (deposit and withdraw)
+  version: 1.0.0
+  contact:
+    name: Bank API Support
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /api/v1/wallet:
+    post:
+      summary: Perform wallet operation
+      description: Performs a deposit or withdraw operation on a wallet
+      operationId: performWalletOperation
+      tags:
+        - Wallet Operations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletOperationRequest'
+            examples:
+              deposit:
+                summary: Deposit example
+                value:
+                  walletId: "123e4567-e89b-12d3-a456-426614174000"
+                  operationType: "DEPOSIT"
+                  amount: 1000.00
+              withdraw:
+                summary: Withdraw example
+                value:
+                  walletId: "123e4567-e89b-12d3-a456-426614174000"
+                  operationType: "WITHDRAW"
+                  amount: 500.00
+      responses:
+        '200':
+          description: Operation successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Operation successful"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficientFunds:
+                  summary: Insufficient funds
+                  value:
+                    error: "Insufficient funds"
+                invalidRequest:
+                  summary: Invalid request
+                  value:
+                    error: "Invalid request format"
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Wallet not found"
+
+  /api/v1/wallets/{walletId}:
+    get:
+      summary: Get wallet balance
+      description: Retrieves the current balance of a specific wallet
+      operationId: getWalletBalance
+      tags:
+        - Wallet Operations
+      parameters:
+        - name: walletId
+          in: path
+          required: true
+          description: UUID of the wallet
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletBalance'
+              example:
+                walletId: "123e4567-e89b-12d3-a456-426614174000"
+                balance: 1500.00
+        '400':
+          description: Invalid UUID format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Invalid UUID format"
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Wallet not found"
+
+components:
+  schemas:
+    WalletOperationRequest:
+      type: object
+      required:
+        - walletId
+        - operationType
+        - amount
+      properties:
+        walletId:
+          type: string
+          format: uuid
+          description: UUID of the wallet
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        operationType:
+          type: string
+          enum: [DEPOSIT, WITHDRAW]
+          description: Type of operation to perform
+          example: "DEPOSIT"
+        amount:
+          type: number
+          format: decimal
+          description: Amount to deposit or withdraw (must be positive)
+          minimum: 0.01
+          example: 1000.00
+
+    WalletBalance:
+      type: object
+      required:
+        - walletId
+        - balance
+      properties:
+        walletId:
+          type: string
+          format: uuid
+          description: UUID of the wallet
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        balance:
+          type: number
+          format: decimal
+          description: Current wallet balance
+          minimum: 0
+          example: 1500.00
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+          example: "Wallet not found"
+
+tags:
+  - name: Wallet Operations
+    description: Operations for managing wallet balances
