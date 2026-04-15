@@ -6,8 +6,8 @@
         <version>3.5.13</version>
         <relativePath/>
     </parent>
-    <groupId>com.example</groupId>
-    <artifactId>demo</artifactId>
+    <groupId>com.savchenko</groupId>
+    <artifactId>bankapp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name/>
     <description/>
